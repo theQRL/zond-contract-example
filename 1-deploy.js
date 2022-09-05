@@ -1,13 +1,13 @@
+require("./qrllib/qrllib-js.js")
+
 const request = require('request');
 const ethUtil = require('ethereumjs-util')
 const Web3EthAbi = require("web3-eth-abi")
-
-require("./qrllib/qrllib-js.js")
 const txHelper = require('./helper/tx.js')
 const contractCompiler = require("./contract-compiler");
 
+/* Compile contract using solidity compiler and get output */
 let output = contractCompiler.GetCompilerOutput()
-
 const inputABI = output.contracts['MyToken.sol']['MyToken'].abi
 
 /* Load Wallet */
@@ -28,7 +28,7 @@ txHelper.SignTx(tx, d)
 
 /* Prepare RPC call request */
 let options = {
-    url: "http://127.0.0.1:8545",
+    url: "http://127.0.0.1:4545",  // Zond RPC API address and port
     method: "post",
     headers:
         {
@@ -46,4 +46,5 @@ request(options, (error, response, body) => {
     }
 });
 
-console.log("Expected contract address ", ethUtil.generateAddress(Buffer.from(d.GetAddress().slice(2), 'hex'), Buffer.from(txHelper.NumToHex(nonce), 'hex')).toString('hex'))
+let deployedContractAddress = '0x' + ethUtil.generateAddress(Buffer.from(d.GetAddress().slice(2), 'hex'), Buffer.from(txHelper.NumToHex(nonce), 'hex')).toString('hex')
+console.log("Expected contract address ", deployedContractAddress)
