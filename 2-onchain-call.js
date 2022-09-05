@@ -13,7 +13,7 @@ const inputABI = output.contracts['MyToken.sol']['MyToken'].abi
 let hexSeed = "062482cca43bfe13e45f925a4226f1c9f4cd143474490552bcb5f1a869693d950133daea7b7fe7526f7abe9b7e873014"
 let d = dilithium.NewFromSeed(hexSeed)
 
-/* Prepare Contract Call Input */
+/* Prepare contract call input for the contract function transfer */
 let callData = Web3EthAbi.encodeFunctionCall(inputABI[12], ["0x2073a9893a8a2c065bf8d0269c577390639ecefa", "10000"])
 
 /* Prepare Contract Deployment Transaction */

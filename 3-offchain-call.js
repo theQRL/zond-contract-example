@@ -9,7 +9,7 @@ const contractCompiler = require("./contract-compiler")
 let output = contractCompiler.GetCompilerOutput()
 const inputABI = output.contracts['MyToken.sol']['MyToken'].abi
 
-/* Prepare Contract Call Input */
+/* Prepare contract call input for the contract function balanceOf */
 let callData = Web3EthAbi.encodeFunctionCall(inputABI[5], ["0x2073a9893a8a2c065bf8d0269c577390639ecefa"])
 
 /* Prepare Contract Deployment Transaction */
