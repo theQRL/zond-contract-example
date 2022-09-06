@@ -8,7 +8,7 @@ let HexToBigInt = function(hexN) {
     return BigInt(parseInt(hexN.slice(2), 16))
 }
 
-let CreateTx = function(nonce, gas, gasPrice, to, value, input) {
+let CreateTx = function(nonce, gas, gasPrice, to, value, data) {
     return {
         "type": NumToHex(2),
         "chainId": NumToHex(1),
@@ -17,11 +17,11 @@ let CreateTx = function(nonce, gas, gasPrice, to, value, input) {
         "gasPrice": NumToHex(gasPrice),
         "to": to,
         "value": NumToHex(value),
-        "input": input,
+        "data": data,
     }
 }
 
-let CreateCall = function(nonce, gas, gasPrice, maxFeePerGas, maxPriorityFeePerGas, from, to, value, input) {
+let CreateCall = function(nonce, gas, gasPrice, maxFeePerGas, maxPriorityFeePerGas, from, to, value, data) {
     return {
         "from": from,
         "chainId": NumToHex(1),
@@ -32,7 +32,7 @@ let CreateCall = function(nonce, gas, gasPrice, maxFeePerGas, maxPriorityFeePerG
         // "maxPriorityFeePerGas": NumToHex(maxPriorityFeePerGas),
         "to": to,
         "value": NumToHex(value),
-        "input": input,
+        "data": data,
     }
 }
 
@@ -44,15 +44,15 @@ let GenerateTxSigningHash = function(tx) {
     let gasPrice = HexToBigInt(tx.gasPrice)
     let to = tx.to
     let value = HexToBigInt(tx.value)
-    let input = tx.input
+    let data = tx.data
     let bytesTo = to.slice(2);
-    let bytesInput = input.slice(2);
+    let bytesData = data.slice(2);
     let expectedBufferSize = 8 * 5;
-    if (to !== '') {
+    if (to) {
         expectedBufferSize += 20
     }
-    if (input !== '') {
-        expectedBufferSize += input.slice(2).length / 2
+    if (data) {
+        expectedBufferSize += data.slice(2).length / 2
     }
 
     let buf = Buffer.alloc(expectedBufferSize)
@@ -66,11 +66,13 @@ let GenerateTxSigningHash = function(tx) {
     buf.writeBigInt64BE(gasPrice, offset)
     offset += 8
 
-    buf.write(to.slice(2), offset, 'hex')
+    if (to) {
+        buf.write(to.slice(2), offset, 'hex')
+    }
     offset += bytesTo.length / 2
     buf.writeBigInt64BE(value, offset)
     offset += 8
-    buf.write(bytesInput, offset, 'hex')
+    buf.write(bytesData, offset, 'hex')
 
     return '0x' + crypto.createHash('sha256').update(buf).digest('hex')
 }

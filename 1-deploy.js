@@ -5,6 +5,7 @@ const ethUtil = require('ethereumjs-util')
 const Web3EthAbi = require("web3-eth-abi")
 const txHelper = require('./helper/tx.js')
 const contractCompiler = require("./contract-compiler");
+const BN = require("bn.js");
 
 /* Compile contract using solidity compiler and get output */
 let output = contractCompiler.GetCompilerOutput()
@@ -23,7 +24,7 @@ contractByteCode = '0x' + contractByteCode + callData.slice(10) // Ignore 0x and
 
 /* Prepare Contract Deployment Transaction */
 let nonce = 0
-let tx = txHelper.CreateTx(nonce, 2000000, 100, "", 0, contractByteCode)
+let tx = txHelper.CreateTx(nonce, 949989, 100, "", 0, contractByteCode)
 txHelper.SignTx(tx, d)
 
 /* Prepare RPC call request */
@@ -46,5 +47,5 @@ request(options, (error, response, body) => {
     }
 });
 
-let deployedContractAddress = '0x' + ethUtil.generateAddress(Buffer.from(d.GetAddress().slice(2), 'hex'), Buffer.from(txHelper.NumToHex(nonce), 'hex')).toString('hex')
+let deployedContractAddress = '0x' + ethUtil.generateAddress(Buffer.from(d.GetAddress().slice(2), 'hex'), new BN(nonce).toBuffer()).toString('hex')
 console.log("Expected contract address ", deployedContractAddress)
