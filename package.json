@@ -9,9 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@theqrl/web3": "^0.1.0",
-    "@theqrl/web3-zond": "^0.1.0",
-    "@theqrl/web3-zond-accounts": "^0.1.0",
+    "@theqrl/web3": "^0.1.1",
+    "@theqrl/web3-zond": "^0.1.1",
+    "@theqrl/web3-zond-accounts": "^0.1.1",
     "ethereumjs-util": "^7.1.5",
     "keccak256": "^1.0.6",
     "request": "^2.88.2",
