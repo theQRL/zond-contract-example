@@ -1,43 +1,50 @@
+var Web3 = require('@theqrl/web3')
+var web3 = new Web3(new Web3.providers.HttpProvider('http://45.76.43.83:4545'))
+const contractCompiler = require("./contract-compiler")
 /* Load Wallet */
 require("./qrllib/qrllib-js.js")
-
-const request = require('request');
-const Web3EthAbi = require("web3-eth-abi");
-const txHelper = require("./helper/tx");
-const contractCompiler = require("./contract-compiler")
 
 let output = contractCompiler.GetCompilerOutput()
 
 const inputABI = output.contracts['MyToken.sol']['MyToken'].abi
 
 /* Load Wallet */
-let hexSeed = "062482cca43bfe13e45f925a4226f1c9f4cd143474490552bcb5f1a869693d950133daea7b7fe7526f7abe9b7e873014"
+var hexSeed = "0x7801414d061d92874f97d2b5614a5c97452b5376c6c1d5729a6b58b8612677a5c683034aa7b175450218b842f4d8de44" //this one is of public node
 let d = dilithium.NewFromSeed(hexSeed)
 
-/* Prepare Contract Call Input */
-let callData = Web3EthAbi.encodeFunctionCall(inputABI[12], ["0x2073a9893a8a2c065bf8d0269c577390639ecefa", "10000"])
-
-/* Prepare Contract Deployment Transaction */
-let tx = txHelper.CreateTx(1, 397700, 10000, "0xbc96cf604092dc53c5021fb122ddb2dffad75821", 0, callData)
-txHelper.SignTx(tx, d)
-
-/* Prepare RPC call request */
-let options = {
-    url: "http://127.0.0.1:8545",
-    method: "post",
-    headers:
+let nonce = 204
+const contract_call = async () => {
+    let address = await d.GetAddress()
+    let contract = new web3.zond.Contract(inputABI, "0xf3a0d03Ea099d97168091EA119161a4AA60E1148")
+    web3.zond.getCode("0xf3a0d03Ea099d97168091EA119161a4AA60E1148", function(error, result) {
+        if(!error) {
+            console.log(result);
+        } else {
+            console.log(error)
+        }
+    });
+    
+    let tx = contract.methods.mint(2)
+    const createTransaction = await web3.zond.accounts.signTransaction(
         {
-            "content-type": "application/json"
+            from: address,
+            data: tx.encodeABI(),
+            nonce: nonce,
+            chainId: "0x1",
+            gas: "0x1e8480",
+            gasPrice:"0x2710",
+            value:"0x0",
+            to: '0xf3a0d03Ea099d97168091EA119161a4AA60E1148',
         },
-    body: JSON.stringify( {"jsonrpc": "2.0", "id": 1, "method": "zond_sendRawTransaction", "params": [tx] })
-};
+        hexSeed
+        );
+    createTransaction.rawTransaction.input = createTransaction.rawTransaction.data
+    createTransaction.rawTransaction.type = '0x2'
+    web3.zond.sendSignedTransaction(
+        createTransaction.rawTransaction
+        ).on('receipt', console.log);
+    console.log('contract call sent!')
 
-/* Make RPC call */
-request(options, (error, response, body) => {
-    if (error) {
-        console.error('An error has occurred: ', error);
-    } else {
-        console.log('Post successful: response: ', body);
-    }
-});
+}
 
+contract_call()

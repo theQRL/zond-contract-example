@@ -1,9 +1,9 @@
-const request = require('request');
+const BN = require('bn.js');
 const ethUtil = require('ethereumjs-util')
-const Web3EthAbi = require("web3-eth-abi")
+var Web3 = require('@theqrl/web3')
+var web3 = new Web3(new Web3.providers.HttpProvider('http://45.76.43.83:4545'))
 
 require("./qrllib/qrllib-js.js")
-const txHelper = require('./helper/tx.js')
 const contractCompiler = require("./contract-compiler");
 
 let output = contractCompiler.GetCompilerOutput()
@@ -11,39 +11,42 @@ let output = contractCompiler.GetCompilerOutput()
 const inputABI = output.contracts['MyToken.sol']['MyToken'].abi
 
 /* Load Wallet */
-let hexSeed = "0x062482cca43bfe13e45f925a4226f1c9f4cd143474490552bcb5f1a869693d950133daea7b7fe7526f7abe9b7e873014"
+var hexSeed = "0x7801414d061d92874f97d2b5614a5c97452b5376c6c1d5729a6b58b8612677a5c683034aa7b175450218b842f4d8de44" //this one is of public node
 let d = dilithium.NewFromSeed(hexSeed)
-
 /* Prepare Contract Input */
 let contractByteCode = output.contracts['MyToken.sol']['MyToken'].evm.bytecode.object
 
-/* Prepare Constructor Input (if any) */
-let callData = Web3EthAbi.encodeFunctionCall(inputABI[0], ["TOKEN123", "HELLO"])
-contractByteCode = '0x' + contractByteCode + callData.slice(10) // Ignore 0x and 8 byte of hex string of constructor signature
-
 /* Prepare Contract Deployment Transaction */
-let nonce = 0
-let tx = txHelper.CreateTx(nonce, 2000000, 100, "", 0, contractByteCode)
-txHelper.SignTx(tx, d)
+let nonce = 202
 
-/* Prepare RPC call request */
-let options = {
-    url: "http://127.0.0.1:8545",
-    method: "post",
-    headers:
+// Deploy contract
+const deploy = async () => {
+    console.log('Attempting to deploy from account:', d.GetAddress());
+    let address = d.GetAddress()
+    let contract = new web3.zond.Contract(inputABI)
+    let tx = contract.deploy({data: contractByteCode, arguments: ["TOKEN123", "HELLO"]})
+    const createTransaction = await web3.zond.accounts.signTransaction(
         {
-            "content-type": "application/json"
+            from: address,
+            data: tx.encodeABI(),
+            nonce: nonce,
+            chainId: "0x1",
+            gas: "0x1e8480",
+            gasPrice:"0x2710",
+            value:"0x0",
+            to: '',
         },
-    body: JSON.stringify( {"jsonrpc": "2.0", "id": 1, "method": "zond_sendRawTransaction", "params": [tx] })
+        hexSeed
+        );
+
+    createTransaction.rawTransaction.type = '0x2'
+    web3.zond.sendSignedTransaction(
+        createTransaction.rawTransaction
+        ).on('receipt', console.log)
+        .on('confirmation', function(confirmationNumber, receipt){ 
+            console.log("confirmation no: ", confirmationNumber)
+        });
+        
+    console.log("Expected contract address ", ethUtil.generateAddress(Buffer.from(d.GetAddress().slice(2), 'hex'), new BN(nonce).toBuffer()).toString('hex'))
 };
-
-/* Make RPC call */
-request(options, (error, response, body) => {
-    if (error) {
-        console.error('An error has occurred: ', error);
-    } else {
-        console.log('Post successful: response: ', body);
-    }
-});
-
-console.log("Expected contract address ", ethUtil.generateAddress(Buffer.from(d.GetAddress().slice(2), 'hex'), Buffer.from(txHelper.NumToHex(nonce), 'hex')).toString('hex'))
+deploy();

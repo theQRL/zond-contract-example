@@ -1,38 +1,33 @@
 /* Load Wallet */
 require("./qrllib/qrllib-js.js")
-
-const request = require('request');
-const Web3EthAbi = require("web3-eth-abi");
-const txHelper = require("./helper/tx");
+var Web3 = require('@theqrl/web3')
+var web3 = new Web3(new Web3.providers.HttpProvider('http://45.76.43.83:4545'))
 const contractCompiler = require("./contract-compiler")
 
 let output = contractCompiler.GetCompilerOutput()
 
 const inputABI = output.contracts['MyToken.sol']['MyToken'].abi
 
-/* Prepare Contract Call Input */
-let callData = Web3EthAbi.encodeFunctionCall(inputABI[5], ["0x2073a9893a8a2c065bf8d0269c577390639ecefa"])
+/* Load Wallet */
 
-/* Prepare Contract Deployment Transaction */
-let tx = txHelper.CreateCall(1, 397700, 10000, 10000, 10000, "0x2073a9893a8a2c065bf8d0269c577390639ecefa", "0xbc96cf604092dc53c5021fb122ddb2dffad75821", 0, callData)
+const contract_call = async () => {
+    let contract = new web3.zond.Contract(inputABI, "0xfddea5fdd39fc4d1fafdf5ab3d8220bd7bde6a86")
+    web3.zond.getCode("0xfddea5fdd39fc4d1fafdf5ab3d8220bd7bde6a86", function(error, result) {
+        if(!error) {
+            console.log(result);
+        } else {
+            console.log(error)
+        }
+    });
+    contract.methods.mint(2).call().then((error, result)=>{
+        if(!error) {
+            console.log(result);
+        } else {
+            console.log(error)
+        }
+    })
 
-/* Prepare RPC call request */
-let options = {
-    url: "http://127.0.0.1:8545",
-    method: "post",
-    headers:
-        {
-            "content-type": "application/json"
-        },
-    body: JSON.stringify( {"jsonrpc": "2.0", "id": 1, "method": "zond_call", "params": [tx, {"blockNumber": "latest"}] })
-};
+}
 
-/* Make RPC call */
-request(options, (error, response, body) => {
-    if (error) {
-        console.error('An error has occurred: ', error);
-    } else {
-        console.log('Post successful: response: ', body);
-    }
-});
+contract_call()
 

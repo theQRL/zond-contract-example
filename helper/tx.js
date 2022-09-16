@@ -44,15 +44,15 @@ let GenerateTxSigningHash = function(tx) {
     let gasPrice = HexToBigInt(tx.gasPrice)
     let to = tx.to
     let value = HexToBigInt(tx.value)
-    let input = tx.input
+    let data = tx.data
     let bytesTo = to.slice(2);
-    let bytesInput = input.slice(2);
+    let bytesInput = data.slice(2);
     let expectedBufferSize = 8 * 5;
     if (to !== '') {
         expectedBufferSize += 20
     }
-    if (input !== '') {
-        expectedBufferSize += input.slice(2).length / 2
+    if (data !== '') {
+        expectedBufferSize += data.slice(2).length / 2
     }
 
     let buf = Buffer.alloc(expectedBufferSize)
