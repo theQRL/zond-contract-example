@@ -16,14 +16,13 @@ let d = dilithium.NewFromSeed(hexSeed)
 /* Prepare Contract Input */
 let contractByteCode = output.contracts['MyToken.sol']['MyToken'].evm.bytecode.object
 
-/* Prepare Contract Deployment Transaction */
-let nonce = 202
 
 // Deploy contract
 const deploy = async () => {
     console.log('Attempting to deploy from account:', d.GetAddress());
     let address = d.GetAddress()
     let contract = new web3.zond.Contract(inputABI)
+    let nonce = await web3.zond.getTransactionCount(address)
     let tx = contract.deploy({data: contractByteCode, arguments: ["TOKEN123", "HELLO"]})
     const createTransaction = await web3.zond.accounts.signTransaction(
         {

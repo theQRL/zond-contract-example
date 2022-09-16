@@ -12,10 +12,10 @@ const inputABI = output.contracts['MyToken.sol']['MyToken'].abi
 var hexSeed = "0x7801414d061d92874f97d2b5614a5c97452b5376c6c1d5729a6b58b8612677a5c683034aa7b175450218b842f4d8de44" //this one is of public node
 let d = dilithium.NewFromSeed(hexSeed)
 
-let nonce = 204
 const contract_call = async () => {
     let address = await d.GetAddress()
     let contract = new web3.zond.Contract(inputABI, "0xf3a0d03Ea099d97168091EA119161a4AA60E1148")
+    let nonce = await web3.zond.getTransactionCount(address)
     web3.zond.getCode("0xf3a0d03Ea099d97168091EA119161a4AA60E1148", function(error, result) {
         if(!error) {
             console.log(result);
