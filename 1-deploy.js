@@ -43,16 +43,17 @@ const deploy = async () => {
         hexSeed
         );
 
-    createTransaction.rawTransaction.type = '0x2'
+    createTransaction.rawTransaction.type = '0x2' // Don't change
 
     console.log('Attempting to deploy from account:', address);
-    web3.zond.sendSignedTransaction(
+    await web3.zond.sendSignedTransaction(
         createTransaction.rawTransaction
         ).on('receipt', console.log)
-        .on('confirmation', function(confirmationNumber, receipt){ 
+        .on('confirmation', function(confirmationNumber, receipt){
             console.log("confirmation no: ", confirmationNumber)
         });
-        
-    console.log("Expected contract address ", ethUtil.generateAddress(Buffer.from(d.GetAddress().slice(2), 'hex'), new BN(nonce).toBuffer()).toString('hex'))
+
+    const deployedContractAddress = Web3.utils.bytesToHex(ethUtil.generateAddress(Buffer.from(d.GetAddress().slice(2), 'hex'), new BN(nonce).toBuffer()))
+    console.log("Expected contract address ", Web3.utils.toChecksumAddress(deployedContractAddress))
 };
 deploy();
