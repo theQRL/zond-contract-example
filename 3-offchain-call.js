@@ -8,26 +8,19 @@ let output = contractCompiler.GetCompilerOutput()
 
 const inputABI = output.contracts['MyToken.sol']['MyToken'].abi
 
-/* Load Wallet */
-
 const contract_call = async () => {
-    let contract = new web3.zond.Contract(inputABI, "0xfddea5fdd39fc4d1fafdf5ab3d8220bd7bde6a86")
-    web3.zond.getCode("0xfddea5fdd39fc4d1fafdf5ab3d8220bd7bde6a86", function(error, result) {
-        if(!error) {
-            console.log(result);
-        } else {
-            console.log(error)
-        }
-    });
-    contract.methods.mint(2).call().then((error, result)=>{
+    // Deployed contract address
+    const deployedContractAddress = "0xfddea5fdd39fc4d1fafdf5ab3d8220bd7bde6a86"
+
+    let contract = new web3.zond.Contract(inputABI, deployedContractAddress)
+
+    contract.methods.balanceOf("0x2073a9893a8a2c065bf8d0269c577390639ecefa").call().then((error, result)=>{
         if(!error) {
             console.log(result);
         } else {
             console.log(error)
         }
     })
-
 }
 
 contract_call()
-

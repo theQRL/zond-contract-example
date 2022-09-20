@@ -1,22 +1,26 @@
-var Web3 = require('@theqrl/web3')
-var web3 = new Web3(new Web3.providers.HttpProvider('http://45.76.43.83:4545'))
+const Web3 = require('@theqrl/web3')
+const web3 = new Web3(new Web3.providers.HttpProvider('http://45.76.43.83:4545'))
 const contractCompiler = require("./contract-compiler")
-/* Load Wallet */
 require("./qrllib/qrllib-js.js")
 
-let output = contractCompiler.GetCompilerOutput()
-
-const inputABI = output.contracts['MyToken.sol']['MyToken'].abi
-
-/* Load Wallet */
-var hexSeed = "0x7801414d061d92874f97d2b5614a5c97452b5376c6c1d5729a6b58b8612677a5c683034aa7b175450218b842f4d8de44" //this one is of public node
+/* Load Dilithium Wallet */
+// Replace this hexseed with your own Dilithium wallet
+const hexSeed = "0x7801414d061d92874f97d2b5614a5c97452b5376c6c1d5729a6b58b8612677a5c683034aa7b175450218b842f4d8de44"
 let d = dilithium.NewFromSeed(hexSeed)
 
+// Call Contract
 const contract_call = async () => {
     let address = await d.GetAddress()
-    let contract = new web3.zond.Contract(inputABI, "0xf3a0d03Ea099d97168091EA119161a4AA60E1148")
+
+    let output = contractCompiler.GetCompilerOutput()
+    const inputABI = output.contracts['MyToken.sol']['MyToken'].abi
+
+    // Deployed contract address
+    const deployedContractAddress = "0xf3a0d03Ea099d97168091EA119161a4AA60E1148"
+
+    let contract = new web3.zond.Contract(inputABI, deployedContractAddress)
     let nonce = await web3.zond.getTransactionCount(address)
-    web3.zond.getCode("0xf3a0d03Ea099d97168091EA119161a4AA60E1148", function(error, result) {
+    web3.zond.getCode(deployedContractAddress, function(error, result) {
         if(!error) {
             console.log(result);
         } else {
@@ -24,17 +28,18 @@ const contract_call = async () => {
         }
     });
     
-    let tx = contract.methods.mint(2)
+    let tx = contract.methods.transfer("0x2073a9893a8a2c065bf8d0269c577390639ecefa", 10000)
+    const estimatedGas = await tx.estimateGas({"from": d.GetAddress()})
     const createTransaction = await web3.zond.accounts.signTransaction(
         {
             from: address,
             data: tx.encodeABI(),
             nonce: nonce,
-            chainId: "0x1",
-            gas: "0x1e8480",
-            gasPrice:"0x2710",
-            value:"0x0",
-            to: '0xf3a0d03Ea099d97168091EA119161a4AA60E1148',
+            chainId: '0x1',
+            gas: estimatedGas,
+            gasPrice: 1000,
+            value: 0,
+            to: deployedContractAddress,
         },
         hexSeed
         );
@@ -44,7 +49,6 @@ const contract_call = async () => {
         createTransaction.rawTransaction
         ).on('receipt', console.log);
     console.log('contract call sent!')
-
 }
 
 contract_call()
