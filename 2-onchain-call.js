@@ -12,7 +12,9 @@ let d = dilithium.NewFromSeed(hexSeed)
 const contract_call = async () => {
     let address = await d.GetAddress()
 
+    // Get solidity compiled contract output
     let output = contractCompiler.GetCompilerOutput()
+
     const inputABI = output.contracts['MyToken.sol']['MyToken'].abi
 
     // Deployed contract address
@@ -22,12 +24,12 @@ const contract_call = async () => {
     let nonce = await web3.zond.getTransactionCount(address)
 
     // Transfer 10000 tokens to 0x2073a9893a8a2c065bf8d0269c577390639ecefa
-    let tx = contract.methods.transfer("0x2073a9893a8a2c065bf8d0269c577390639ecefa", 10000)
-    const estimatedGas = await tx.estimateGas({"from": d.GetAddress()})
+    let contractSend = contract.methods.transfer("0x2073a9893a8a2c065bf8d0269c577390639ecefa", 10000)
+    const estimatedGas = await contractSend.estimateGas({"from": d.GetAddress()})
     const createTransaction = await web3.zond.accounts.signTransaction(
         {
             from: address,
-            data: tx.encodeABI(),
+            data: contractSend.encodeABI(),
             nonce: nonce,
             chainId: '0x1',
             gas: estimatedGas,

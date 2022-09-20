@@ -2,7 +2,7 @@ const BN = require('bn.js');
 const ethUtil = require('ethereumjs-util')
 const Web3 = require('@theqrl/web3')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://45.76.43.83:4545'))
-
+const contractCompiler = require("./contract-compiler");
 require("./qrllib/qrllib-js.js")
 
 /* Load Dilithium Wallet */
@@ -14,8 +14,7 @@ let d = dilithium.NewFromSeed(hexSeed)
 const deploy = async () => {
     let address = d.GetAddress()
 
-    /* Prepare Contract Input */
-    const contractCompiler = require("./contract-compiler");
+    // Get solidity compiled contract output
     let output = contractCompiler.GetCompilerOutput()
 
     const inputABI = output.contracts['MyToken.sol']['MyToken'].abi
@@ -23,16 +22,16 @@ const deploy = async () => {
 
     let contract = new web3.zond.Contract(inputABI)
 
-    let tx = contract.deploy({data: contractByteCode, arguments: ["TOKEN123", "HELLO"]})
+    let contractSend = contract.deploy({data: contractByteCode, arguments: ["TOKEN123", "TOK"]})
 
     // This gives you the latest available nonce for the account
     let nonce = await web3.zond.getTransactionCount(address)
-    const estimatedGas = await tx.estimateGas({"from": d.GetAddress()})
+    const estimatedGas = await contractSend.estimateGas({"from": d.GetAddress()})
 
     const createTransaction = await web3.zond.accounts.signTransaction(
         {
             from: address,
-            data: tx.encodeABI(),
+            data: contractSend.encodeABI(),
             nonce: nonce,
             chainId: '0x1',
             gas: estimatedGas,
