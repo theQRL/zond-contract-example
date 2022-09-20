@@ -20,14 +20,8 @@ const contract_call = async () => {
 
     let contract = new web3.zond.Contract(inputABI, deployedContractAddress)
     let nonce = await web3.zond.getTransactionCount(address)
-    web3.zond.getCode(deployedContractAddress, function(error, result) {
-        if(!error) {
-            console.log(result);
-        } else {
-            console.log(error)
-        }
-    });
-    
+
+    // Transfer 10000 tokens to 0x2073a9893a8a2c065bf8d0269c577390639ecefa
     let tx = contract.methods.transfer("0x2073a9893a8a2c065bf8d0269c577390639ecefa", 10000)
     const estimatedGas = await tx.estimateGas({"from": d.GetAddress()})
     const createTransaction = await web3.zond.accounts.signTransaction(
@@ -43,12 +37,13 @@ const contract_call = async () => {
         },
         hexSeed
         );
-    createTransaction.rawTransaction.input = createTransaction.rawTransaction.data
-    createTransaction.rawTransaction.type = '0x2'
-    web3.zond.sendSignedTransaction(
+
+    createTransaction.rawTransaction.type = '0x2' // Don't change
+
+    console.log("sending transaction and waiting for the receipt")
+    await web3.zond.sendSignedTransaction(
         createTransaction.rawTransaction
         ).on('receipt', console.log);
-    console.log('contract call sent!')
 }
 
 contract_call()
