@@ -9,13 +9,13 @@ if(config.hexseed == "hexseed_here") {
 const BN = require('bn.js');
 const ethUtil = require('ethereumjs-util')
 const Web3 = require('@theqrl/web3')
-const web3 = new Web3(new Web3.providers.HttpProvider('http://45.76.43.83:4545'))
+const web3 = new Web3(new Web3.providers.HttpProvider(config.provider))
 const contractCompiler = require("./contract-compiler");
 require("./qrllib/qrllib-js.js")
 
 /* Load Dilithium Wallet */
 // Replace this hexseed with your own Dilithium wallet
-const hexSeed = "0x7801414d061d92874f97d2b5614a5c97452b5376c6c1d5729a6b58b8612677a5c683034aa7b175450218b842f4d8de44"
+const hexSeed = config.hexseed
 let d = dilithium.NewFromSeed(hexSeed)
 
 // Deploy contract
