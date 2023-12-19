@@ -81,7 +81,7 @@ node 1-deploy.js
 
 It should return a decent sized json response. While it's being confirmed (12 confirmations with the default config), take your `contractAddress`, and put it in the `contract_address` section of `config.json`
 
-```json
+```
 {
   blockHash: '0xb962fb7e2c908b28d1edd710675b15304e95d6c750c9ffec9c1e4708c6e6adb5',
   blockNumber: 9036,
