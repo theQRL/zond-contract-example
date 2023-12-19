@@ -1,5 +1,6 @@
 {
-    "provider":"http://45.76.43.83:4545",
+    "provider":"http://localhost:8545",
     "hexseed":"hexseed_here",
-    "contract":"contract_here"
+    "contract_address":"contract_address_here",
+    "tx_required_confirmations": 12
 }

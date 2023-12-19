@@ -1,6 +1,6 @@
 {
   "name": "zond-contract-example",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,14 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@theqrl/web3": "^0.1.1",
-    "@theqrl/web3-zond": "^0.1.1",
-    "@theqrl/web3-zond-accounts": "^0.1.1",
-    "ethereumjs-util": "^7.1.5",
-    "keccak256": "^1.0.6",
-    "request": "^2.88.2",
-    "rlp": "^3.0.0",
-    "solc": "^0.8.16",
-    "web3-eth-abi": "^1.7.5"
+    "@theqrl/web3": "^0.2.1",
+    "solc": "^0.8.16"
   }
 }
