@@ -29,17 +29,19 @@ Open up `config.json`, there you'll see:
 
 ```json
 {
-    "provider":"http://45.76.43.83:4545",
+    "provider":"http://localhost:8545",
     "hexseed":"hexseed_here",
-    "contract":"contract_here"
+    "contract_address":"contract_address_here",
+    "tx_required_confirmations": 12
 }
 ```
 
 As an overview:
 
-1. **Provider**: The provider is the node that you send contract requests too. If you're running a local node, it can be changed to `http://127.0.0.1:4545/`
+1. **Provider**: The provider is the node that you send contract requests too. If you're running a local node, it can be changed to `http://localhost:8545/`
 2. **Hexseed**: The hexseed and address of the wallet you want to deploy from.
-3. **Contract**: The contract address from your deployment step after running `1-deploy.js`
+3. **Contract Address**: The contract address from your deployment step after running `1-deploy.js`
+4. **Transaction confirmation blocks** This defines the number of blocks it requires until a transaction will be handled as confirmed.
 
 You can get your hexseed from the `zond-cli`
 
@@ -60,9 +62,10 @@ Replace `hexseed_here` with the hexseed in `config.json`
 
 ```json
 {
-    "provider":"http://45.76.43.83:4545",
+    "provider":"http://localhost:4545",
     "hexseed":"0xa76b9cac647b68bf6a0e9fb0c53133ea5ff2efade54ba67aef1aa8a9e22b86b750bb8d7301aae6f309ddb20b3e1a1995",
-    "contract":"contract_here"
+    "contract_address":"contract_address_here",
+    "tx_required_confirmations": 12
 }
 ```
 
@@ -76,7 +79,7 @@ After that, deploy the smart contract
 node 1-deploy.js
 ```
 
-It should return a decent sized json response. While it's being confirmed (will take two minutes/two confirmations), take your `contractAddress`, and put it in the `contract` section of `config.json`
+It should return a decent sized json response. While it's being confirmed (12 confirmations with the default config), take your `contractAddress`, and put it in the `contract_address` section of `config.json`
 
 ```json
 {
@@ -116,7 +119,8 @@ Your `config.json` file should look now look something like this:
 {
     "provider":"http://45.76.43.83:4545",
     "hexseed":"0xa76b9cac647b68bf6a0e9fb0c53133ea5ff2efade54ba67aef1aa8a9e22b86b750bb8d7301aae6f309ddb20b3e1a1995",
-    "contract":"0xecf54b758c2793466FD48517E5E84313Dc5C89ee"
+    "contract_address":"0xecf54b758c2793466FD48517E5E84313Dc5C89ee",
+    "tx_required_confirmations": 12
 }
 ```
 
