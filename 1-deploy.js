@@ -1,66 +1,43 @@
-const config = require("./config.json");
+const config = require("./config.json")
+const contractCompiler = require("./contract-compiler")
+const { Web3 } = require('@theqrl/web3')
+const web3 = new Web3(new Web3.providers.HttpProvider(config.provider))
 
-// Check for config requirements
 if(config.hexseed == "hexseed_here") {
-    console.log("You need a to enter a dilithium hexseed for this to work.");
-    process.exit(1);
+    console.log("You need a to enter a dilithium hexseed for this to work.")
+    process.exit(1)
 }
 
-const BN = require('bn.js');
-const ethUtil = require('ethereumjs-util')
-const Web3 = require('@theqrl/web3')
-const web3 = new Web3(new Web3.providers.HttpProvider(config.provider))
-const contractCompiler = require("./contract-compiler");
-require("./qrllib/qrllib-js.js")
+const acc = web3.zond.accounts.seedToAccount(config.hexseed)
 
-/* Load Dilithium Wallet */
-// Replace this hexseed with your own Dilithium wallet
-const hexSeed = config.hexseed
-let d = dilithium.NewFromSeed(hexSeed)
+const confirmationHandler = function(confirmation){
+    console.log(confirmation)
+}
 
-// Deploy contract
-const deploy = async () => {
-    let address = d.GetAddress()
+const receiptHandler = function(receipt){
+    console.log("Contract address ", receipt.contractAddress)
+}
 
-    // Get solidity compiled contract output
-    let output = contractCompiler.GetCompilerOutput()
+const deployMyTokenContract = async () => {
+    console.log('Attempting to deploy MyToken contract from account:', acc.address)
+    
+    const output = contractCompiler.GetCompilerOutput()
 
-    const inputABI = output.contracts['MyToken.sol']['MyToken'].abi
-    let contractByteCode = output.contracts['MyToken.sol']['MyToken'].evm.bytecode.object
+    const contractABI = output.contracts['MyToken.sol']['MyToken'].abi
+    const contractByteCode = output.contracts['MyToken.sol']['MyToken'].evm.bytecode.object
+    const contract = new web3.zond.Contract(contractABI)
+    
+    contract.transactionConfirmationBlocks = config.tx_required_confirmations
+    const deployOptions = {data: contractByteCode, arguments: ["TOKEN123", "TOK"]}
+    const estimatedGas = await contract.deploy(deployOptions).estimateGas({from: acc.address})
+    const sendOptions = { from: acc.address, gas: estimatedGas, type: 2 }
+    
+    await contract
+        .deploy(deployOptions)
+        .send(sendOptions)
+        .on('confirmation', confirmationHandler)
+        .on('receipt', receiptHandler)
+        .on('error', console.error)
+}
 
-    let contract = new web3.zond.Contract(inputABI)
-
-    let contractSend = contract.deploy({data: contractByteCode, arguments: ["TOKEN123", "TOK"]})
-
-    // This gives you the latest available nonce for the account
-    let nonce = await web3.zond.getTransactionCount(address)
-    const estimatedGas = await contractSend.estimateGas({"from": d.GetAddress()})
-
-    const createTransaction = await web3.zond.accounts.signTransaction(
-        {
-            from: address,
-            data: contractSend.encodeABI(),
-            nonce: nonce,
-            chainId: '0x1',
-            gas: estimatedGas,
-            gasPrice: 1000,
-            value: 0,
-            to: '',
-        },
-        hexSeed
-        );
-
-    createTransaction.rawTransaction.type = '0x2' // Don't change
-
-    console.log('Attempting to deploy from account:', address);
-    await web3.zond.sendSignedTransaction(
-        createTransaction.rawTransaction
-        ).on('receipt', console.log)
-        .on('confirmation', function(confirmationNumber, receipt){
-            console.log("confirmation no: ", confirmationNumber)
-        });
-
-    const deployedContractAddress = Web3.utils.bytesToHex(ethUtil.generateAddress(Buffer.from(d.GetAddress().slice(2), 'hex'), new BN(nonce).toBuffer()))
-    console.log("Expected contract address ", Web3.utils.toChecksumAddress(deployedContractAddress))
-};
-deploy();
+deployMyTokenContract()
