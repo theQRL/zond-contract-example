@@ -10,10 +10,6 @@ if(config.hexseed == "hexseed_here") {
 
 const acc = web3.zond.accounts.seedToAccount(config.hexseed)
 
-const confirmationHandler = function(confirmation){
-    console.log(confirmation)
-}
-
 const receiptHandler = function(receipt){
     console.log("Contract address ", receipt.contractAddress)
 }
@@ -35,7 +31,7 @@ const deployMyTokenContract = async () => {
     await contract
         .deploy(deployOptions)
         .send(sendOptions)
-        .on('confirmation', confirmationHandler)
+        .on('confirmation', console.log)
         .on('receipt', receiptHandler)
         .on('error', console.error)
 }

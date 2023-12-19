@@ -15,10 +15,6 @@ if(config.contract_address == "contract_address_here") {
 
 const acc = web3.zond.accounts.seedToAccount(config.hexseed)
 
-const confirmationHandler = function(confirmation){
-    console.log(confirmation)
-}
-
 const receiverAccAddress = "0x2073a9893a8a2c065bf8d0269c577390639ecefa"
 
 const transferMyToken = async () => {
@@ -37,7 +33,7 @@ const transferMyToken = async () => {
     await contract.methods
         .transfer(receiverAccAddress, 10000)
         .send(sendOptions)
-        .on('confirmation', confirmationHandler)
+        .on('confirmation', console.log)
         .on('receipt', console.log)
         .on('error', console.error)
 }
