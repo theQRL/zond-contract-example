@@ -14,6 +14,8 @@ if(config.contract_address == "contract_address_here") {
 }
 
 const acc = web3.zond.accounts.seedToAccount(config.hexseed)
+web3.zond.wallet?.add(config.hexseed)
+web3.zond.transactionConfirmationBlocks = config.tx_required_confirmations
 
 const receiverAccAddress = "0x2073a9893a8a2c065bf8d0269c577390639ecefa"
 
@@ -26,16 +28,14 @@ const transferMyToken = async () => {
     const contractAddress = config.contract_address
     const contract = new web3.zond.Contract(contractABI, contractAddress)
     
-    contract.transactionConfirmationBlocks = config.tx_required_confirmations
-    const estimatedGas = await contract.methods.transfer(receiverAccAddress, 10000).estimateGas({"from": acc.address})
-    const sendOptions = { from: acc.address, gas: estimatedGas, type: 2 }
+    const contractTransfer = contract.methods.transfer(receiverAccAddress, 10000)
+    const estimatedGas = await contractTransfer.estimateGas({"from": acc.address})
+    const txObj = {type: '0x2', gas: estimatedGas, from: acc.address, data: contractTransfer.encodeABI(), to: config.contract_address}
     
-    await contract.methods
-        .transfer(receiverAccAddress, 10000)
-        .send(sendOptions)
-        .on('confirmation', console.log)
-        .on('receipt', console.log)
-        .on('error', console.error)
+    await web3.zond.sendTransaction(txObj, undefined, { checkRevertBeforeSending: true })
+    .on('confirmation', console.log)
+    .on('receipt', console.log)
+    .on('error', console.error)
 }
 
 transferMyToken()

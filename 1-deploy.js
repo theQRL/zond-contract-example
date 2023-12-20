@@ -9,6 +9,8 @@ if(config.hexseed == "hexseed_here") {
 }
 
 const acc = web3.zond.accounts.seedToAccount(config.hexseed)
+web3.zond.wallet?.add(config.hexseed)
+web3.zond.transactionConfirmationBlocks = config.tx_required_confirmations
 
 const receiptHandler = function(receipt){
     console.log("Contract address ", receipt.contractAddress)
@@ -23,17 +25,15 @@ const deployMyTokenContract = async () => {
     const contractByteCode = output.contracts['MyToken.sol']['MyToken'].evm.bytecode.object
     const contract = new web3.zond.Contract(contractABI)
     
-    contract.transactionConfirmationBlocks = config.tx_required_confirmations
     const deployOptions = {data: contractByteCode, arguments: ["TOKEN123", "TOK"]}
-    const estimatedGas = await contract.deploy(deployOptions).estimateGas({from: acc.address})
-    const sendOptions = { from: acc.address, gas: estimatedGas, type: 2 }
+    const contractDeploy = contract.deploy(deployOptions)
+    const estimatedGas = await contractDeploy.estimateGas({from: acc.address})
+    const txObj = {type: '0x2', gas: estimatedGas, from: acc.address, data: contractDeploy.encodeABI()}
     
-    await contract
-        .deploy(deployOptions)
-        .send(sendOptions)
-        .on('confirmation', console.log)
-        .on('receipt', receiptHandler)
-        .on('error', console.error)
+    await web3.zond.sendTransaction(txObj, undefined, { checkRevertBeforeSending: false })
+    .on('confirmation', console.log)
+    .on('receipt', receiptHandler)
+    .on('error', console.error)
 }
 
 deployMyTokenContract()
