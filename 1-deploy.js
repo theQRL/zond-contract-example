@@ -25,8 +25,8 @@ const deployMyTokenContract = async () => {
     const contractByteCode = output.contracts['MyToken.sol']['MyToken'].evm.bytecode.object
     const contract = new web3.zond.Contract(contractABI)
     
-    contractDeploy = contract.deploy(deployOptions)
     const deployOptions = {data: contractByteCode, arguments: ["TOKEN123", "TOK"]}
+    const contractDeploy = contract.deploy(deployOptions)
     const estimatedGas = await contractDeploy.estimateGas({from: acc.address})
     const txObj = {type: '0x2', gas: estimatedGas, from: acc.address, data: contractDeploy.encodeABI()}
     
