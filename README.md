@@ -2,26 +2,13 @@
 
 ## Step 1: Install the Zond POS Node
 
-It's recommended you follow the instructions here: https://zond-docs.theqrl.org/node/node-installation
-
-You can also use an unofficial install script at https://www.github.com/jackalyst/zond-init
+It's recommended you follow the instructions here: [https://test-zond.theqrl.org/install](https://test-zond.theqrl.org/install)
 
 ## Step 2: Create a Zond Dilithium wallet & get some testnet QRL
 
-Inside of the `~/zond` directory, run the `zond-cli` command to create a wallet.
+Use the [wallet creation instructions](https://test-zond.theqrl.org/creating-wallet) to create a wallet and note the Dilithium public address.
 
-```
-cd ~/zond
-./zond-cli wallet add-dilithium
-```
-
-You can then get your dilithium address with
-
-```
-./zond-cli wallet list
-```
-
-Once you have your Dilithium address, it's time to get some Testnet QRL. This can be done by going to the [QRL Discord](https://www.theqrl.org/discord) and requesting some Testnet QRL. Later we'll have a faucet that can be drawn from.
+You will now seen some Testnet funds. This can be done by going to the [QRL Discord](https://www.theqrl.org/discord) and requesting some Testnet QRL.  Later we'll have a faucet that can be drawn from.
 
 ## Step 3: Fill out config.json with preliminary information
 
@@ -39,26 +26,18 @@ Open up `config.json`, there you'll see:
 As an overview:
 
 1. **Provider**: The provider is the node that you send contract requests too. If you're running a local node, it can be changed to `http://localhost:8545/`
-2. **Hexseed**: The hexseed and address of the wallet you want to deploy from.
+2. **Hexseed**: The hexseed of the wallet you want to deploy from **beginning with 0x**.
 3. **Contract Address**: The contract address from your deployment step after running `1-deploy.js`
 4. **Transaction confirmation blocks** This defines the number of blocks it requires until a transaction will be handled as confirmed.
 
-You can get your hexseed from the `zond-cli`
+Your wallet hexseed can be extracted from your wallet file using the tool at: [https://github.com/theQRL/hexseed-from-address](https://github.com/theQRL/hexseed-from-address), e.g.
 
-```
-cd ~/zond
-./zond-cli wallet secret
-```
-
-That should return something like:
-
-```
-1	0x201acdf30deb0ee1a420a0e2be164634988b4c7d	0xa76b9cac647b68bf6a0e9fb0c53133ea5ff2efade54ba67aef1aa8a9e22b86b750bb8d7301aae6f309ddb20b3e1a1995		poland rod pulsar enzyme hence wash avert winter sharp beacon trifle your usable talent facial hebrew upset prince preach calmly manual joyous rudder stony acid quick victor pagan realm relate boast offset
+```bash
+npm i -g @theqrl/hexseed-from-address
+hexseed-from-address -p SecretPassword123 -a 0x201acdf30deb0ee1a420a0e2be164634988b4c7d -d ~/gzonddata
 ```
 
-The hexseed is the third value, in this example it's `0xa76b9cac647b68bf6a0e9fb0c53133ea5ff2efade54ba67aef1aa8a9e22b86b750bb8d7301aae6f309ddb20b3e1a1995`
-
-Replace `hexseed_here` with the hexseed in `config.json`
+The hexseed should be prefixed with `0x` and put in the `config.json` file in place of the `hexseed_here` placeholder.
 
 ```json
 {
