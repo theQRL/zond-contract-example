@@ -2,13 +2,13 @@
 
 ## Step 1: Install the Zond POS Node
 
-It's recommended you follow the instructions here: [https://test-zond.theqrl.org/install](https://test-zond.theqrl.org/install)
+It's recommended you follow the instructions here: [https://test-zond.theqrl.org/install](https://test-zond.theqrl.org/testnet/install)
 
 ## Step 2: Create a Zond Dilithium wallet & get some testnet QRL
 
-Use the [wallet creation instructions](https://test-zond.theqrl.org/creating-wallet) to create a wallet and note the Dilithium public address.
+Use the [Zond Web3 Wallet](https://github.com/theQRL/zond-web3-wallet) to create a wallet and note the Dilithium public address and hexseed.
 
-You will now seen some Testnet funds. This can be done by going to the [QRL Discord](https://www.theqrl.org/discord) and requesting some Testnet QRL.  Later we'll have a faucet that can be drawn from.
+Note: To populate the funds, you'll want to edit `scripts/local_testnet/network_params.yml` (in your qrysm directory) and add your public address and how many funds you want. Then stop and start the node again.
 
 ## Step 3: Fill out config.json with preliminary information
 
