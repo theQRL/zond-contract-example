@@ -2,7 +2,7 @@
 
 ## Step 1: Install the Zond POS Node
 
-It's recommended you follow the instructions here: [[https://test-zond.theqrl.org/install](https://test-zond.theqrl.org/beta-testnet/install)]([https://test-zond.theqrl.org/instal](https://test-zond.theqrl.org/beta-testnet/install)
+It's recommended you follow the instructions here: [[https://test-zond.theqrl.org/install](https://test-zond.theqrl.org/beta-testnet/install)]([https://test-zond.theqrl.org/instal](https://test-zond.theqrl.org/beta-testnet/install))
 
 ## Step 2: Create a Zond Dilithium wallet & get some testnet QRL
 
