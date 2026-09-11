@@ -8,14 +8,14 @@ if(config.contract_address == "contract_address_here") {
     process.exit(1)
 }
 
-const accAddress = "Z2073a9893a8a2c065bf8d0269c577390639ecefa"
+const accAddress = "Q2073a9893a8a2c065bf8d0269c577390639ecefa"
 
 const checkMyTokenBalance = async () => {
     console.log('Attempting to check MyToken balance for account:', accAddress)
 
     const output = contractCompiler.GetCompilerOutput()
     const contractABI = output.contracts['MyToken.hyp']['MyToken'].abi
-    const contract = new web3.zond.Contract(contractABI, config.contract_address)
+    const contract = new web3.qrl.Contract(contractABI, config.contract_address)
     contract.methods.balanceOf(accAddress).call().then((result, error)=>{
         if(error) {
             console.log(error)
